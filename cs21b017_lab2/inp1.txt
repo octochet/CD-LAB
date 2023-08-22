@@ -1,0 +1,11 @@
+#include <stdio.h>
+/*
+hehehe
+*/
+int main() {
+    int x = 0; //lol
+    float y = 4.56879;
+    char ch9 = 'c';
+    printf("Hello World!!"); 
+    return 0;
+}
