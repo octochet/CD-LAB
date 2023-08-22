@@ -1,0 +1,11 @@
+        Name    |            Type
+--------------------------------
+        main    |      Identifier
+           x    |      Identifier
+           y    |      Identifier
+         ch9    |      Identifier
+           c    |      Identifier
+      printf    |      Identifier
+           z    |      Identifier
+       scanf    |      Identifier
+           i    |      Identifier
