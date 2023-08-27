@@ -1,6 +1,9 @@
 #include <stdio.h>
 int main()
 {
+   /*
+   Code to write to a file
+   */
    char name[50];
    int marks, i, num;
 
