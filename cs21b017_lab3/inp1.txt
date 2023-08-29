@@ -1,2 +1,15 @@
 i+i+i
 i*i*i+i
+345 + 635 + bv
+i+i+(i*i)
+345
+i+i*
+i+i
+i*i
+i+i*i
+i+i+i*i+i
++i
+i
+
+a + b + 9
+3*3+1

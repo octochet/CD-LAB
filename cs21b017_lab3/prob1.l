@@ -1,161 +1,165 @@
 %option noyywrap
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-int E();
-int Edash();
-int T();
-int Tdash();
-int F();
+/*
+Grammar:-
+E -> TE'
+E' -> +TE' | epsilon
+T -> FT'
+T' -> *FT' | epsilon
+F -> (E) | id | num
+id -> (letter|_)(letter|digit|_)*
+num -> [digit]+
+*/
 
-const char *cursor;
-char string[64];
+// Token definitions
+#define NUM 257
+#define ID 258
+#define PLUS 259
+#define TIMES 260
+#define LPAREN 261
+#define RPAREN 262
+#define NL 263
+
+// Global variables
+int lookahead;
+int ValidOrNot = 1;
+// Function prototypes
+void E();
+void E_prime();
+void T();
+void T_prime();
+void F();
+void match(int expectedToken);
 %}
 
-TERMINALS [i+*]
+DIGIT       [0-9]
+LETTER      [a-zA-Z]
+ID          ({LETTER}|_)({LETTER}|{DIGIT}|_)*
+NUM         {DIGIT}+
+NL          \n
 
 %%
-{TERMINALS}*        {strcpy(string, yytext); cursor = string; return E();}
-
-.                { fprintf(stderr, "Invalid character: %c\n", yytext[0]); return 1; }
-
-\n               { /*PRINT THE RESULT*/ }
-"exit"           { return 0; }
-
-
-
+{NUM}       { printf("%s",yytext); return NUM; }
+{ID}        { printf("%s",yytext); return ID; }
+"+"         { printf("%s",yytext); return PLUS; }
+"*"         { printf("%s",yytext); return TIMES; }
+"("         { printf("%s",yytext); return LPAREN; }
+")"         { printf("%s",yytext); return RPAREN; }
+{NL}        { printf(""); return NL; }
+<<EOF>>     { return EOF; }
 %%
 
-int main(int argc, char *argv[])
-{
-    if (argc != 2)
-    {
-        fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
+int main(int argc, char *argv[]) {
+    FILE *input_file;
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s input_file\n", argv[0]);
         return 1;
     }
-
-    FILE *input_file = fopen(argv[1], "r");
-    if (!input_file)
-    {
-        perror("Error opening file");
+    input_file = fopen(argv[1], "r");
+    if (input_file == NULL) {
+        fprintf(stderr, "Error: could not open input file '%s'\n", argv[1]);
         return 1;
     }
-
     yyin = input_file;
-    yylex(); // Read and match the input using the "<INPUT>" rule
-
-    // while (1)
-    // {
-    //     if (E() && *cursor == '\0')
-    //     {
-    //         printf("String is successfully parsed\n");
-    //     }
-    //     else
-    //     {
-    //         printf("Error in parsing String\n");
-    //     }
-
-    //     // Read the next line from the file
-    //     if (!fgets(string, sizeof(string), input_file))
-    //         break;
-    //     cursor = string;
-    // }
-
-    fclose(input_file);
+    //run for whole input file
+    while (1) {
+        lookahead = yylex();
+        if(lookahead == EOF)
+            break;
+        ValidOrNot = 1;
+        E();
+        if (lookahead == NL && ValidOrNot==1)
+            printf(" : Input is valid.\n");
+        else
+            printf(" : Input is invalid.\n");
+    }
+    
+    // lookahead = yylex();
+    // E();
+    // if (lookahead == NL)
+    //     printf("Input is valid.\n");
+    // else
+    //     printf("Input is invalid.\n");
+    // fclose(input_file);
     return 0;
 }
 
-int E()
-{
-    printf("%-16s E -> TE'\n", cursor);
-    if (T())
-    {
-        if (Edash())
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    else
-    {
-        return 0;
+// E -> TE'
+void E() {
+    T();
+    E_prime();
+}
+
+// E' -> +TE' | epsilon
+void E_prime() {
+    if (lookahead == PLUS) {
+        match(PLUS);
+        T();
+        E_prime();
     }
 }
 
-int Edash()
-{
-    if (*cursor == '+')
-    {
-        printf("%-16s E' -> + T E'\n", cursor);
-        cursor++;
-        if (T())
-        {
-            if (Edash())
-                return 1;
-            else
-                return 0;
-        }
-        else
-            return 0;
-    }
-    else
-    {
-        printf("%-16s E' -> $\n", cursor);
-        return 1;
+// T -> FT'
+void T() {
+    F();
+    T_prime();
+}
+
+// T' -> *FT' | epsilon
+void T_prime() {
+    if (lookahead == TIMES) {
+        match(TIMES);
+        F();
+        T_prime();
     }
 }
 
-int T()
-{
-    printf("%-16s T -> F T'\n", cursor);
-    if (F())
-    {
-        if (Tdash())
-            return 1;
-        else
-            return 0;
+// F -> (E) | id | num
+// id -> (letter|_)(letter|digit|_)*
+// num -> [digit]+
+void F() {
+    if (lookahead == NUM)
+        match(NUM);
+    else if (lookahead == ID)
+        match(ID);
+    else if (lookahead == LPAREN) {
+        match(LPAREN);
+        E();
+        match(RPAREN);
     }
-    else
-        return 0;
+    else if (lookahead != NL) { // check that lookahead is not NL
+        //printf("Error: Invalid token.\n");
+        //exit(1);
+        ValidOrNot=0;
+        while(lookahead != NL)
+            lookahead = yylex();
+    }
+    else {
+        //printf("Error: Empty string not allowed.\n");
+        //exit(1);
+        ValidOrNot=0;
+        while(lookahead != NL)
+            lookahead = yylex();
+    }
+    // else {
+    //     //printf("Error: Invalid token.\n");
+    //     //exit(1);
+    //     //call yylex() until you get \n
+    //     while(lookahead != NL)
+    //         lookahead = yylex();
+    // }
 }
 
-int Tdash()
-{
-    if (*cursor == '*')
-    {
-        printf("%-16s T' -> * F T'\n", cursor);
-        cursor++;
-        if (F())
-        {
-            if (Tdash())
-                return 1;
-            else
-                return 0;
-        }
-        else
-            return 0;
-    }
-    else
-    {
-        printf("%-16s T' -> $\n", cursor);
-        return 1;
+void match(int expectedToken) {
+    if (lookahead == expectedToken)
+        lookahead = yylex();
+    else {
+        printf("Error: Unexpected token. Expected token code: %d, Actual token code: %d\n", expectedToken, lookahead);
+        exit(1);
     }
 }
 
-int F()
-{
-    if (*cursor == 'i')
-    {
-        printf("%-16s F -> i\n", cursor);
-        cursor++;
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
