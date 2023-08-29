@@ -5,7 +5,7 @@
 #include <string.h>
 
 /*
-Grammar:-
+This is a recursive descent parser for the Grammar:-
 E -> TE'
 E' -> +TE' | epsilon
 T -> FT'
@@ -27,7 +27,8 @@ num -> [digit]+
 // Global variables
 int lookahead;
 int ValidOrNot = 1;
-// Function prototypes
+
+// Function prototypes Declarations
 void E();
 void E_prime();
 void T();
@@ -49,7 +50,7 @@ NL          \n
 "*"         { printf("%s",yytext); return TIMES; }
 "("         { printf("%s",yytext); return LPAREN; }
 ")"         { printf("%s",yytext); return RPAREN; }
-{NL}        { printf(""); return NL; }
+{NL}        { return NL; }
 <<EOF>>     { return EOF; }
 %%
 
@@ -72,19 +73,11 @@ int main(int argc, char *argv[]) {
             break;
         ValidOrNot = 1;
         E();
-        if (lookahead == NL && ValidOrNot==1)
-            printf(" : Input is valid.\n");
+        if (ValidOrNot==1)
+            printf(": VALID\n");
         else
-            printf(" : Input is invalid.\n");
+            printf(": INVALID\n");
     }
-    
-    // lookahead = yylex();
-    // E();
-    // if (lookahead == NL)
-    //     printf("Input is valid.\n");
-    // else
-    //     printf("Input is invalid.\n");
-    // fclose(input_file);
     return 0;
 }
 
@@ -145,13 +138,6 @@ void F() {
         while(lookahead != NL)
             lookahead = yylex();
     }
-    // else {
-    //     //printf("Error: Invalid token.\n");
-    //     //exit(1);
-    //     //call yylex() until you get \n
-    //     while(lookahead != NL)
-    //         lookahead = yylex();
-    // }
 }
 
 void match(int expectedToken) {
