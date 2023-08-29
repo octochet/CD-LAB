@@ -10,4 +10,4 @@ lex.yy.c:${fname}
 	flex ${fname}
 
 clean:
-	del /f *.exe lex.yy.c symbol_table.txt
+	rm -f lexer lex.yy.c symbol_table.txt
