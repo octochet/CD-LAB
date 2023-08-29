@@ -16,9 +16,10 @@ char string[64];
 TERMINALS [i+*]
 
 %%
-{TERMINALS}*        {strcpy(string, yytext); cursor = string; return E();}
 
-.                { fprintf(stderr, "Invalid character: %c\n", yytext[0]); return 1; }
+{TERMINALS}*        {strcpy(string, yytext); cursor = string; if (E() && *cursor == '\0') printf("String is successfully parsed\n"); else printf("Error in parsing String\n");}
+
+.                { fprintf(stderr, "Invalid character: %c\n", yytext[0]);}
 
 \n               { /*PRINT THE RESULT*/ }
 "exit"           { return 0; }
@@ -43,24 +44,9 @@ int main(int argc, char *argv[])
     }
 
     yyin = input_file;
-    yylex(); // Read and match the input using the "<INPUT>" rule
+    yyrestart(yyin);
 
-    // while (1)
-    // {
-    //     if (E() && *cursor == '\0')
-    //     {
-    //         printf("String is successfully parsed\n");
-    //     }
-    //     else
-    //     {
-    //         printf("Error in parsing String\n");
-    //     }
-
-    //     // Read the next line from the file
-    //     if (!fgets(string, sizeof(string), input_file))
-    //         break;
-    //     cursor = string;
-    // }
+    yylex();
 
     fclose(input_file);
     return 0;
