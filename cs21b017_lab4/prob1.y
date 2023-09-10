@@ -6,7 +6,7 @@ int yyerror(char*);
 extern FILE * yyin;
 %}
 
-%token NUMBER PLUS MINUS IOTA SCOL ERROR
+%token NUMBER PLUS MINUS IOTA SCOL ERROR END
 
 %%
 
@@ -14,6 +14,10 @@ complex_list:
     complex_number SCOL{printf("\tVALID\n");} complex_list | 
     error SCOL {printf("\tINVALID\n");}complex_list |
     ERROR SCOL {printf("\tINVALID\n");}complex_list |
+    END {exit(0);}|
+    error END {printf("\tINVALID\n");exit(0);} |
+    ERROR END {printf("\tINVALID\n");exit(0);} |
+    complex_number END {printf("\tVALID\n");exit(0);} |
 
     ;
 complex_number:
