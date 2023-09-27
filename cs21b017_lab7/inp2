@@ -1,0 +1,7 @@
+result = a++ * 5.43425;
+result = --b;
+result = x++ * ++x;
+x = (a+b)*c;
+result_90 = value - (2 * -3);
+result = (p * p) + (q * q) - (r * r);
+result = ++y;
