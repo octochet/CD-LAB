@@ -1,50 +1,50 @@
 %{
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdbool.h>
 int yylex();
 int yyerror(char*);
 extern FILE * yyin;
 %}
 
-%token INT_CONST FLOAT_CONST IDENTIFIER SEMICOLON PLUS MINUS MUL DIV ASSIGN LEFT_PAREN RIGHT_PAREN INC DEC
-
-%left PLUS MINUS
-%left MUL DIV
-%right UMINUS UPLUS
-%right ASSIGN
-%left INC DEC
+%token NUMBER PLUS MINUS IOTA SCOL ERROR END
 
 %%
 
-program_unit				: expr_list                               
-                            ;
-expr_list					: assign_stmt SEMICOLON {printf("VALID\n");}expr_list
-                            | error SEMICOLON {printf("INVALID\n");} expr_list
-                            |
-                            ;
-assign_stmt                 : IDENTIFIER ASSIGN assign_stmt
-                            | arithmetic_expression
-                            ;
-arithmetic_expression		: primary_exp
-                            | arithmetic_expression PLUS arithmetic_expression
-                            | arithmetic_expression MINUS arithmetic_expression
-                            | arithmetic_expression MUL arithmetic_expression
-                            | arithmetic_expression DIV arithmetic_expression
-                            | MINUS arithmetic_expression %prec UMINUS
-                            | PLUS arithmetic_expression %prec UPLUS
-                            ;
-primary_exp					: INT_CONST
-                            | FLOAT_CONST
-                            | IDENTIFIER check
-                            | LEFT_PAREN arithmetic_expression RIGHT_PAREN check
-                            | INC IDENTIFIER
-                            | DEC IDENTIFIER
-                            | INC LEFT_PAREN arithmetic_expression RIGHT_PAREN
-                            | DEC LEFT_PAREN arithmetic_expression RIGHT_PAREN
-                            ;
-check                       : INC | DEC | ;
+complex_list:
+    complex_number SCOL{printf("\tVALID\n");} complex_list | 
+    error SCOL {printf("\tINVALID\n");}complex_list |
+    ERROR SCOL {printf("\tINVALID\n");}complex_list |
+    END {exit(0);}|
+    error END {printf("\tINVALID\n");exit(0);} |
+    ERROR END {printf("\tINVALID\n");exit(0);} |
+    complex_number END {printf("\tVALID\n");exit(0);} |
+
+    ;
+complex_number:
+    sign NUMBER |
+    sign NUMBER IOTA |
+    sign IOTA |
+    sign IOTA operator NUMBER |
+    sign NUMBER operator IOTA |
+    sign NUMBER operator NUMBER IOTA |
+    sign NUMBER operator IOTA NUMBER |
+    sign NUMBER IOTA operator NUMBER |
+    sign IOTA NUMBER operator NUMBER |
+    sign IOTA NUMBER
+    ;
+sign:
+    PLUS | MINUS |
+    ;
+operator:
+    PLUS|MINUS
+    ;
 %%
+
+int yyerror(char *s){
+    //printf("\tINVALID\n");
+    //yyparse();
+    return 0;
+}
 
 int main(int argc, char* argv[])
 {
@@ -56,10 +56,4 @@ int main(int argc, char* argv[])
 	}
     yyparse();
 	return 0;
-}
-
-int yyerror(char *s){
-    //printf("\tINVALID\n");
-    //yyparse();
-    return 0;
 }
