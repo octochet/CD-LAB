@@ -7,7 +7,7 @@ int yyerror(char*);
 extern FILE * yyin;
 %}
 
-%token INT_CONST FLOAT_CONST IDENTIFIER SEMICOLON PLUS MINUS MUL DIV ASSIGN LEFT_PAREN RIGHT_PAREN INC DEC
+%token INT_CONST FLOAT_CONST IDENTIFIER SEMICOLON PLUS MINUS MUL DIV ASSIGN LEFT_PAREN RIGHT_PAREN INC DEC EoF
 
 %left PLUS MINUS
 %left MUL DIV
@@ -20,7 +20,8 @@ extern FILE * yyin;
 program_unit				: expr_list                               
                             ;
 expr_list					: assign_stmt SEMICOLON {printf("VALID\n");}expr_list
-                            | error SEMICOLON {printf("INVALID\n");} expr_list
+                            | error SEMICOLON {printf("INVALID!! Error: Syntax Error\n");} expr_list
+                            | error EoF {printf("INVALID!! Error: Missing Semicolon\n");exit(0);}
                             |
                             ;
 assign_stmt                 : IDENTIFIER ASSIGN assign_stmt

@@ -41,6 +41,7 @@ int input_index = 0;
                             ; return IDENTIFIER; }
 [\t\n ]+                { /* ignore whitespace */ }
 .                       { input_string[input_index++] = yytext[0]; }
+<<EOF>>                 { printf("%-50s",input_string);return EoF;}
 %%
 
 int yyinput(char *buf, int max_size) {
