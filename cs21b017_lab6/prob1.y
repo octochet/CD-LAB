@@ -22,6 +22,7 @@ program_unit				: expr_list
 expr_list					: assign_stmt SEMICOLON {printf("VALID\n");}expr_list
                             | error SEMICOLON {printf("INVALID!! Error: Syntax Error\n");} expr_list
                             | error EoF {printf("INVALID!! Error: Missing Semicolon\n");exit(0);}
+                            | EoF {exit(0);}
                             |
                             ;
 assign_stmt                 : IDENTIFIER ASSIGN assign_stmt
