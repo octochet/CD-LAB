@@ -12,7 +12,7 @@ make clean
 ~~~
 3. For rest of the labs,
 ~~~bash
-make fname=prob1 parser
-./parser inp1
+make fname=prob1
+./parser inp<number>
 make clean
 ~~~
