@@ -36,6 +36,7 @@ int l = 0;
 %token <addr> VAR
 %type <addr> StatementList
 %type <addr> ElseStmt
+%type <addr> elif
 %type <addr> PreRelexp
 %type <addr> Relexp
 %type <addr> Statement
@@ -58,9 +59,14 @@ StatementList:
 
 ElseStmt:
 	ELSE LCURL StatementList RCURL {}
-	| { }
+	| elif
+        | { }
 	;
-
+elif: ELSE IF LPAREN PreRelexp RPAREN LCURL dummyLabels dummyLabels{
+			printf("\n\nif %s goto %s:\ngoto %s:", $4, $7, $8);
+			printf("\n%s:", $7);
+		} StatementList { printf("\n%s:", $8); } RCURL ElseStmt { printf("%s:", genBlockLabel()); }
+	;
 dummyLabels:
 	   { $$ = (char*)malloc(100*sizeof(char)); $$ = genBlockLabel(); }
 
