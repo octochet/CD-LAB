@@ -1,0 +1,44 @@
+int x=3;
+switch(x) {
+    case 1:
+        break;
+    case 2:
+        break;
+    case 3:
+        break;
+    default:
+        break;
+}
+
+int y=4,z=2;
+switch(y) {
+    case x:
+        break;
+    case y+x*2:
+        break;
+    case z:
+        break;
+    default:
+        break;
+}
+
+char c = 'c';
+switch(c) {
+    case 'a':
+        break;
+    case 'b':
+        break;
+    case 'c':
+        switch(x) {
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            default:
+                break;
+        }
+    default:
+        break;
+}
